@@ -4,7 +4,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const express = require('express');
 const router = express.Router();
 const ethers = require('ethers');
-const schedule = require('node-schedule');
+const nodeCron = require('node-cron');
 const Token = require('../../NFTMarketplace.json');
 const tokenAddress = '0x0fFCDEd751812f6ef317378600852288AD022366';
 const provider = new ethers.providers.JsonRpcProvider(
@@ -71,9 +71,9 @@ contract.on(
     console.log('Auction started!!!', auctionCreationData);
 
     const date = new Date(auctionCreationData.endTime * 1000);
-    console.log(date);
-    schedule.scheduleJob(date, async function () {
+    nodeCron.schedule(date, async function () {
       try {
+        console.log('Auction scheduled!');
         let wallet = new ethers.Wallet(PRIVATE_KEY, provider);
         let contractWithSigner = contract.connect(wallet);
         let tx = await contractWithSigner.endAuction(
