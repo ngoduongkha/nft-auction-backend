@@ -4,7 +4,8 @@ const PORT = process.env.PORT || 5000;
 const express = require('express');
 const mongoose = require('mongoose');
 const mongoString = process.env.DATABASE_URL;
-const routes = require('./src/routes/routes');
+const nftRoutes = require('./src/routes/nft');
+const userRoutes = require('./src/routes/user');
 
 mongoose.connect(mongoString);
 const database = mongoose.connection;
@@ -19,7 +20,8 @@ database.once('connected', () => {
 const app = express();
 
 app.use(express.json());
-app.use('/api', routes);
+app.use('/api/nft', nftRoutes);
+app.use('/api/user', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server Started at ${PORT}`);
