@@ -70,8 +70,8 @@ contract.on(
 
     console.log('Auction started!!!', auctionCreationData);
 
-    const date = new Date(auctionCreationData.endTime * 1000);
-    nodeCron.schedule(date, async function () {
+    const date = new Date(auctionCreationData.endTime);
+    nodeCron.schedule(date.getSeconds(), async function () {
       try {
         console.log('Auction scheduled!');
         let wallet = new ethers.Wallet(PRIVATE_KEY, provider);
