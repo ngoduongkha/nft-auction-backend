@@ -1,18 +1,20 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const express = require('express');
+const PROJECT_ID = process.env.PROJECT_ID;
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+
+const express = require("express");
 const router = express.Router();
-const ethers = require('ethers');
-const schedule = require('node-schedule');
-const Token = require('../../NFTMarketplace.json');
-const tokenAddress = '0x0fFCDEd751812f6ef317378600852288AD022366';
+const ethers = require("ethers");
+const schedule = require("node-schedule");
+const Token = require("../../NFTMarketplace.json");
 const provider = new ethers.providers.JsonRpcProvider(
-  'https://rinkeby.infura.io/v3/ff81c88502c540f0b690b55ed77a2c71'
+  `https://rinkeby.infura.io/v3/${PROJECT_ID}`
 );
-const contract = new ethers.Contract(tokenAddress, Token.abi, provider);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, Token.abi, provider);
 const fetch = (...args) =>
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 async function IPFStoJSON(i, tokenContract) {
   const tokenUri =
@@ -48,7 +50,7 @@ async function IPFStoJSON(i, tokenContract) {
 }
 
 contract.on(
-  'MarketItemAuctionListed',
+  "MarketItemAuctionListed",
   (
     tokenId,
     nftContract,
@@ -68,27 +70,28 @@ contract.on(
       endTime: endTime.toString(),
     };
 
-    console.log('Auction started!!!', auctionCreationData);
+    const date = new Date(0);
+    date.setUTCSeconds(auctionCreationData.endTime);
 
-    const date = new Date(auctionCreationData.endTime);
     schedule.scheduleJob(date, async function () {
       try {
-        console.log('Auction scheduled!');
+        console.log("End auction job started!");
         let wallet = new ethers.Wallet(PRIVATE_KEY, provider);
         let contractWithSigner = contract.connect(wallet);
         let tx = await contractWithSigner.endAuction(
           auctionCreationData.tokenId
         );
         console.log(tx);
+        console.log("End auction job done!");
       } catch (error) {
-        console.error('End auction failed!');
-        console.error('Error: ', error);
+        console.error("End auction failed!");
+        console.error("Error: ", error.message);
       }
     });
   }
 );
 
-router.get('/', async function (req, res) {
+router.get("/", async function (req, res) {
   try {
     const { cursor, howMany } = req.body;
     const data = await contract.fetchAllNFTs(cursor ?? 0, howMany ?? 1);
@@ -103,7 +106,7 @@ router.get('/', async function (req, res) {
   }
 });
 
-router.get('/:id', async function (req, res) {
+router.get("/:id", async function (req, res) {
   try {
     const data = await contract.fetchMarketItem(req.params.id);
     const result = await IPFStoJSON(data, contract);
