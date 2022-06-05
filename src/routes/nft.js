@@ -24,7 +24,7 @@ async function IPFStoJSON(i, tokenContract) {
   const response = await fetch(tokenUri);
   const meta = await response.json();
 
-  const autionInfo = {
+  const auctionInfo = {
     startAt: i.auctionInfo.startAt.toString(),
     endAt: i.auctionInfo.endAt.toString(),
     highestBidder: i.auctionInfo.highestBidder,
@@ -45,7 +45,7 @@ async function IPFStoJSON(i, tokenContract) {
     sold: i.sold,
     bidded: i.bidded,
     isMultiToken: i.isMultiToken,
-    autionInfo: autionInfo,
+    auctionInfo: auctionInfo,
   };
 }
 
@@ -95,8 +95,8 @@ contract.on(
 
 router.get("/", async function (req, res) {
   try {
-    const { cursor, howMany } = req.body;
-    const data = await contract.fetchAllNFTs(cursor ?? 0, howMany ?? 1);
+    const { cursor, howMany } = req.query;
+    const data = await contract.fetchAllNFTs(cursor ?? 0, howMany ?? 10);
     const result = [];
     for (const item of data.items) {
       result.push(await IPFStoJSON(item, contract));
@@ -108,7 +108,52 @@ router.get("/", async function (req, res) {
   }
 });
 
-router.get("/:id", async function (req, res) {
+router.get("/available", async function (req, res) {
+  try {
+    const data = await contract.fetchAvailableMarketItems();
+    const result = [];
+    for (const item of data.items) {
+      result.push(await IPFStoJSON(item, contract));
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/user-auction/:userAddress", async function (req, res) {
+  try {
+    const { userAddress } = req.params;
+    const data = await contract.fetchAvailableBiddedAuction(userAddress);
+    console.log(data);
+    const result = [];
+    for (const item of data.items) {
+      result.push(await IPFStoJSON(item, contract));
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/user/:userAddress", async function (req, res) {
+  try {
+    const { userAddress } = req.params;
+    const data = await contract.fetchMyNFTs(userAddress);
+    const result = [];
+    for (const item of data.items) {
+      result.push(await IPFStoJSON(item, contract));
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/id/:id", async function (req, res) {
   try {
     const data = await contract.fetchMarketItem(req.params.id);
     const result = await IPFStoJSON(data, contract);
