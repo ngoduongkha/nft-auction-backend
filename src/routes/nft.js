@@ -71,7 +71,7 @@ contract.on(
     };
 
     const date = new Date(0);
-    date.setUTCSeconds(Number(auctionCreationData.endTime) + 5);
+    date.setUTCSeconds(Number(auctionCreationData.endTime) + 30);
     console.log("Job scheduled at: ", date);
 
     schedule.scheduleJob(date, async function () {
