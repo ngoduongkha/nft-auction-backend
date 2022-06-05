@@ -72,11 +72,12 @@ contract.on(
 
     const date = new Date(0);
     date.setUTCSeconds(auctionCreationData.endTime);
+    console.log("Job scheduled at: ", date);
 
     schedule.scheduleJob(date, async function () {
       try {
         console.log("End auction job started!");
-        console.log("Item", auctionCreationData);
+        console.log("Item: ", auctionCreationData);
         let wallet = new ethers.Wallet(PRIVATE_KEY, provider);
         let contractWithSigner = contract.connect(wallet);
         let tx = await contractWithSigner.endAuction(
