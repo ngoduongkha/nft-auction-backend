@@ -2,6 +2,24 @@ const mongoose = require("mongoose");
 const { isEmail } = require("validator");
 const { isAddress } = require("ethers/lib/utils");
 
+const collectionSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    trim: true,
+    unique: true,
+    required: "Collection address is required",
+    validate: [isAddress, "Please fill a valid collection address"],
+  },
+  isMultiToken: {
+    type: Boolean,
+    required: true,
+  },
+});
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -24,7 +42,6 @@ const userSchema = new mongoose.Schema({
   wallet: {
     type: String,
     trim: true,
-    lowercase: true,
     unique: true,
     required: "Wallet address is required",
     validate: [isAddress, "Please fill a valid wallet address"],
@@ -32,12 +49,14 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
     trim: true,
-    required: true,
   },
   banner: {
     type: String,
     trim: true,
-    required: true,
+  },
+  collections: {
+    type: [collectionSchema],
+    default: undefined,
   },
 });
 

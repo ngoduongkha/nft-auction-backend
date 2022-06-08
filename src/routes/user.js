@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/user");
+const hre = require("hardhat");
 
 router.get("/", async function (_req, res) {
   return UserModel.find()
@@ -40,7 +41,7 @@ router.get("/wallet/:wallet", async function (req, res) {
 
 router.post("/", async function (req, res) {
   const { username, bio, email, wallet, image, banner } = req.body;
-
+  console.log(req.body);
   const user = new UserModel({
     username: username,
     bio: bio,
@@ -66,6 +67,43 @@ router.post("/", async function (req, res) {
         error: error.message,
       })
     );
+});
+
+router.post("/collection", async function (req, res) {
+  const { userId, name, isMultiToken } = req.body;
+  const contract = isMultiToken
+    ? await hre.ethers.getContractFactory("UITToken1155")
+    : await hre.ethers.getContractFactory("UITToken721");
+  const token = await contract.deploy();
+  await token.deployed();
+
+  const collection = {
+    name: name,
+    address: token.address,
+    isMultiToken: isMultiToken,
+  };
+
+  return UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $push: { collections: collection },
+    },
+    { new: true }
+  )
+    .then((data) =>
+      res.status(201).json({
+        success: true,
+        message: "New collection added successfully",
+        user: data,
+      })
+    )
+    .catch((error) => {
+      res.status(500).json({
+        success: false,
+        message: "Server error. Please try again.",
+        error: error.message,
+      });
+    });
 });
 
 router.patch("/:id", async function (req, res) {

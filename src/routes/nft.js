@@ -10,7 +10,7 @@ const express = require("express");
 const router = express.Router();
 const ethers = require("ethers");
 const schedule = require("node-schedule");
-const Token = require("../../NFTMarketplace.json");
+const Token = require("../../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json");
 const provider = new ethers.providers.JsonRpcProvider(
   `https://rinkeby.infura.io/v3/${PROJECT_ID}`
 );
