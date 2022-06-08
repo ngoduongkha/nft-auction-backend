@@ -3,6 +3,8 @@ require("dotenv").config();
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PROJECT_ID = process.env.PROJECT_ID;
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+const ERC1155_CONTRACT_ADDRESS = process.env.ERC1155_CONTRACT_ADDRESS;
+const ERC721_CONTRACT_ADDRESS = process.env.ERC721_CONTRACT_ADDRESS;
 
 const express = require("express");
 const router = express.Router();

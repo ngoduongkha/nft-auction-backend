@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const { isEmail } = require('validator');
-const { isAddress } = require('ethers/lib/utils');
+const mongoose = require("mongoose");
+const { isEmail } = require("validator");
+const { isAddress } = require("ethers/lib/utils");
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: 'Username address is required',
+    required: "Username address is required",
     trim: true,
     lowercase: true,
   },
@@ -18,16 +18,16 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
     unique: true,
-    required: 'Email address is required',
-    validate: [isEmail, 'Please fill a valid email address'],
+    required: "Email address is required",
+    validate: [isEmail, "Please fill a valid email address"],
   },
   wallet: {
     type: String,
     trim: true,
     lowercase: true,
     unique: true,
-    required: 'Wallet address is required',
-    validate: [isAddress, 'Please fill a valid wallet address'],
+    required: "Wallet address is required",
+    validate: [isAddress, "Please fill a valid wallet address"],
   },
   image: {
     type: String,
@@ -41,4 +41,4 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('UserModel', userSchema);
+module.exports = mongoose.model("User", userSchema);
