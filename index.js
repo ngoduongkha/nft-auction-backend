@@ -4,8 +4,9 @@ const PORT = process.env.PORT || 5000;
 const express = require("express");
 const mongoose = require("mongoose");
 const mongoString = process.env.DATABASE_URL;
-const nftRoutes = require("./src/routes/nft");
-const userRoutes = require("./src/routes/user");
+const nftRoutes = require("./src/routes/nft.route");
+const userRoutes = require("./src/routes/user.route");
+const authRoutes = require("./src/routes/auth.route");
 const cors = require("cors");
 
 mongoose.connect(mongoString);
@@ -21,6 +22,7 @@ database.once("connected", () => {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use("/auth", authRoutes);
 app.use("/api/nft", nftRoutes);
 app.use("/api/user", userRoutes);
 

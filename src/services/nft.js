@@ -10,7 +10,6 @@ const provider = new ethers.providers.JsonRpcProvider(
   `https://rinkeby.infura.io/v3/${PROJECT_ID}`
 );
 const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-import NftModel, { findOne, findOneAndUpdate } from "../models/nft";
 
 contract.on(
   "MarketItemAuctionListed",
@@ -53,43 +52,5 @@ contract.on(
         console.error("Error: ", error.message);
       }
     });
-  }
-);
-
-contract.on(
-  "MarketItemCreated",
-  (tokenId, nftContract, owner, isMultiToken) => {
-    const nft = new NftModel({
-      tokenId: tokenId,
-      nftContract: nftContract,
-      owner: owner,
-      isMultiToken: isMultiToken,
-    });
-
-    nft.save().catch((error) => {
-      console.log("Create market item failed");
-      console.log("Message: ", error.message);
-    });
-  }
-);
-
-contract.on(
-  "MarketItemListed",
-  (tokenId, nftContract, owner, isMultiToken, price) => {
-    const temp = findOne({ tokenId: tokenId });
-
-    findOneAndUpdate(
-      { tokenId: tokenId },
-      {
-        price: price,
-        sold: false,
-        seller: temp.owner,
-        owner: CONTRACT_ADDRESS,
-      },
-      (err) => {
-        console.log("List market item failed");
-        console.log("Message: ", err.message);
-      }
-    );
   }
 );
