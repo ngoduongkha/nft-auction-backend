@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "D:\\GitHub\\nft-auction-backend\\contracts\\NFTMarketplace.sol": {
-      "lastModificationDate": 1654537819811,
-      "contentHash": "764ba9bc6f16e17b83aafac92b08e3f3",
+      "lastModificationDate": 1655224124535,
+      "contentHash": "ab99189958b1ec211812380dd556001e",
       "sourceName": "contracts/NFTMarketplace.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -44,8 +44,8 @@
       ]
     },
     "D:\\GitHub\\nft-auction-backend\\contracts\\UITToken1155.sol": {
-      "lastModificationDate": 1654537819815,
-      "contentHash": "8398f09eed0516045c22b358d699c858",
+      "lastModificationDate": 1655224140164,
+      "contentHash": "d249040f59dbb8059633088d5fc0184a",
       "sourceName": "contracts/UITToken1155.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -83,8 +83,8 @@
       ]
     },
     "D:\\GitHub\\nft-auction-backend\\contracts\\UITToken721.sol": {
-      "lastModificationDate": 1654446960060,
-      "contentHash": "9124cac39ea25afa86d68a7af2367caa",
+      "lastModificationDate": 1655224130397,
+      "contentHash": "819a630b45ae62966f5cb979e073a27a",
       "sourceName": "contracts/UITToken721.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -111,7 +111,8 @@
       },
       "imports": [
         "@openzeppelin/contracts/token/ERC721/ERC721.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
       ],
       "versionPragmas": [
         "^0.8.3"

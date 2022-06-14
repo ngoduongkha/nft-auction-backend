@@ -12,8 +12,7 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   address owner;
-  UITToken1155 _multiToken;
-  UITToken721 _nftToken;
+
   struct Bid {
     address bidder;
     uint256 bid;
@@ -50,11 +49,7 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
   event MarketItemBidded(uint256 indexed tokenId, address indexed nftContract, address seller, address bidder, uint256 bid, uint256 bidTime);
   event BidderWithdraw(uint256 indexed tokenId, address indexed nftContract, address seller, address bidder, uint256 balance);
 
-  constructor(address _mToken, address _nToken) {
-    _multiToken = UITToken1155(_mToken);
-    _nftToken = UITToken721(_nToken);
-    _multiToken.setParentAddress(address(this));
-    _nftToken.setParentAddress(address(this));
+  constructor() {
     owner = payable(msg.sender);
   }
 
@@ -76,9 +71,9 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
     _tokenIds.increment();
     uint256 tokenId = _tokenIds.current();
     if (isMultiToken) {
-      createNFT1155(tokenId, 1, tokenUri); // Amount set to 1 as NFT
+      createNFT1155(tokenId, 1, tokenUri, nftContract); // Amount set to 1 as NFT
     } else {
-      createNFT721(tokenId, tokenUri, "UITToken", "UIT");
+      createNFT721(tokenId, tokenUri, nftContract);
     }
     idMarketItemMapping[tokenId].tokenId = tokenId;
     idMarketItemMapping[tokenId].nftContract = nftContract;
@@ -167,6 +162,7 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
         transferToken(address(this), idMarketItemMapping[tokenId].seller, tokenId, idMarketItemMapping[tokenId].nftContract, idMarketItemMapping[tokenId].isMultiToken);
         idMarketItemMapping[tokenId].owner = payable(idMarketItemMapping[tokenId].seller);
     }
+    payable(idMarketItemMapping[tokenId].seller).transfer(listingPrice);
     idMarketItemMapping[tokenId].seller = payable(address(0));
     idMarketItemMapping[tokenId].bidded = true;
     emit MarketItemAuctionEnded(tokenId, idMarketItemMapping[tokenId].nftContract, idMarketItemMapping[tokenId].owner, idMarketItemMapping[tokenId].isMultiToken, idMarketItemMapping[tokenId].auctionInfo.highestBidder, idMarketItemMapping[tokenId].auctionInfo.highestBid, block.timestamp);
@@ -177,6 +173,7 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
     require(idMarketItemMapping[tokenId].sold == false, "Item isn't on sale");
     require(msg.value == idMarketItemMapping[tokenId].price, "Buyer must transfer equal price of item");
     payable(idMarketItemMapping[tokenId].seller).transfer(msg.value);
+    payable(idMarketItemMapping[tokenId].seller).transfer(listingPrice);
     idMarketItemMapping[tokenId].owner = payable(msg.sender);
     idMarketItemMapping[tokenId].seller = payable(address(0));
     idMarketItemMapping[tokenId].sold = true;
@@ -207,163 +204,163 @@ contract NFTMarketplace is ReentrancyGuard, ERC1155Holder, ERC721Holder {
     emit MarketItemCancelListed(tokenId, idMarketItemMapping[tokenId].nftContract, idMarketItemMapping[tokenId].owner, idMarketItemMapping[tokenId].isMultiToken, idMarketItemMapping[tokenId].price);
   }
 
-  function fetchMarketItem(uint256 _id) external view returns(MarketItem memory){
-    return idMarketItemMapping[_id];
-  }
+  // function fetchMarketItem(uint256 _id) external view returns(MarketItem memory){
+  //   return idMarketItemMapping[_id];
+  // }
 
-  function fetchAllNFTs(uint256 cursor, uint256 howMany) external view returns (MarketItem[] memory items, uint256 newCursor, uint256 totalItemCount) {
-    uint _totalItemCount = _tokenIds.current();
-    if (cursor >= _totalItemCount) {
-      MarketItem[] memory _emptyItem = new MarketItem[](0);
-      return (_emptyItem, cursor, _totalItemCount);
-    }
-    uint256 length = howMany;
-    if (length > _totalItemCount - cursor) {
-      length = _totalItemCount - cursor;
-    }
+  // function fetchAllNFTs(uint256 cursor, uint256 howMany) external view returns (MarketItem[] memory items, uint256 newCursor, uint256 totalItemCount) {
+  //   uint _totalItemCount = _tokenIds.current();
+  //   if (cursor >= _totalItemCount) {
+  //     MarketItem[] memory _emptyItem = new MarketItem[](0);
+  //     return (_emptyItem, cursor, _totalItemCount);
+  //   }
+  //   uint256 length = howMany;
+  //   if (length > _totalItemCount - cursor) {
+  //     length = _totalItemCount - cursor;
+  //   }
 
-    MarketItem[] memory _items = new MarketItem[](length);
-    for (uint i = cursor; i < length + cursor; i++) {
-      MarketItem storage currentItem = idMarketItemMapping[i+1];
-      _items[i] = currentItem;
-    }
-    return (_items, cursor + length, _totalItemCount);
-  }
+  //   MarketItem[] memory _items = new MarketItem[](length);
+  //   for (uint i = cursor; i < length + cursor; i++) {
+  //     MarketItem storage currentItem = idMarketItemMapping[i+1];
+  //     _items[i] = currentItem;
+  //   }
+  //   return (_items, cursor + length, _totalItemCount);
+  // }
 
-  /* Returns all available market items */
-  function fetchAvailableMarketItems() public view returns (MarketItem[] memory items) {
-    uint totalItemCount = _tokenIds.current();
-    uint itemCount = 0;
-    uint currentIndex = 0;
+  // /* Returns all available market items */
+  // function fetchAvailableMarketItems() public view returns (MarketItem[] memory items) {
+  //   uint totalItemCount = _tokenIds.current();
+  //   uint itemCount = 0;
+  //   uint currentIndex = 0;
 
-    for (uint i = 0; i < totalItemCount; i++) {
-      if (idMarketItemMapping[i + 1].sold == false || (idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.endAt > block.timestamp && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp)) {
-        itemCount += 1;
-      }
-    }
+  //   for (uint i = 0; i < totalItemCount; i++) {
+  //     if (idMarketItemMapping[i + 1].sold == false || (idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.endAt > block.timestamp && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp)) {
+  //       itemCount += 1;
+  //     }
+  //   }
 
-    MarketItem[] memory _items = new MarketItem[](itemCount);
-    for (uint i = 0; i < totalItemCount; i++) {
-      if (idMarketItemMapping[i + 1].sold == false || (idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.endAt > block.timestamp && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp)) {
-        uint currentId = i + 1;
-        MarketItem storage currentItem = idMarketItemMapping[currentId];
-        _items[currentIndex] = currentItem;
-        currentIndex += 1;
-      }
-    }
-    return _items;
-  }
+  //   MarketItem[] memory _items = new MarketItem[](itemCount);
+  //   for (uint i = 0; i < totalItemCount; i++) {
+  //     if (idMarketItemMapping[i + 1].sold == false || (idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.endAt > block.timestamp && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp)) {
+  //       uint currentId = i + 1;
+  //       MarketItem storage currentItem = idMarketItemMapping[currentId];
+  //       _items[currentIndex] = currentItem;
+  //       currentIndex += 1;
+  //     }
+  //   }
+  //   return _items;
+  // }
 
-  /* Returns all available bidded auction */
-  function fetchAvailableBiddedAuction() public view returns (MarketItem[] memory items) {
-    uint totalItemCount = _tokenIds.current();
-    uint itemCount = 0;
-    uint currentIndex = 0;
+  // /* Returns all available bidded auction */
+  // function fetchAvailableBiddedAuction() public view returns (MarketItem[] memory items) {
+  //   uint totalItemCount = _tokenIds.current();
+  //   uint itemCount = 0;
+  //   uint currentIndex = 0;
 
-    for (uint i = 0; i < totalItemCount; i++) {
-      if (idMarketItemMapping[i + 1].sold == true && idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp && idMarketItemMapping[i + 1].auctionInfo.highestBidder != address(0)) {
-        if (idMarketItemMapping[i + 1].auctionInfo.highestBidder == msg.sender) {
-          itemCount += 1;
-        } else {
-          Bid[] memory bids = idMarketItemMapping[i + 1].auctionInfo.bids;
-          for (uint j = 0; j < bids.length; j++) {
-            if (bids[j].bidder == msg.sender) {
-              itemCount += 1;
-              break;
-            }
-          }
-        }
-      }
-    }
+  //   for (uint i = 0; i < totalItemCount; i++) {
+  //     if (idMarketItemMapping[i + 1].sold == true && idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp && idMarketItemMapping[i + 1].auctionInfo.highestBidder != address(0)) {
+  //       if (idMarketItemMapping[i + 1].auctionInfo.highestBidder == msg.sender) {
+  //         itemCount += 1;
+  //       } else {
+  //         Bid[] memory bids = idMarketItemMapping[i + 1].auctionInfo.bids;
+  //         for (uint j = 0; j < bids.length; j++) {
+  //           if (bids[j].bidder == msg.sender) {
+  //             itemCount += 1;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
 
-    MarketItem[] memory _items = new MarketItem[](itemCount);
-    for (uint i = 0; i < totalItemCount; i++) {
-      if (idMarketItemMapping[i + 1].sold == true && idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp && idMarketItemMapping[i + 1].auctionInfo.highestBidder != address(0)) {
-        if (idMarketItemMapping[i + 1].auctionInfo.highestBidder == msg.sender) {
-          uint currentId = i + 1;
-          MarketItem storage currentItem = idMarketItemMapping[currentId];
-          _items[currentIndex] = currentItem;
-          currentIndex += 1;
-        } else {
-          Bid[] memory bids = idMarketItemMapping[i + 1].auctionInfo.bids;
-          for (uint j = 0; j < bids.length; j++) {
-            if (bids[j].bidder == msg.sender) {
-              uint currentId = i + 1;
-              MarketItem storage currentItem = idMarketItemMapping[currentId];
-              _items[currentIndex] = currentItem;
-              currentIndex += 1;
-              break;
-            }
-          }
-        }
-      }
-    }
-    return _items;
-  }
+  //   MarketItem[] memory _items = new MarketItem[](itemCount);
+  //   for (uint i = 0; i < totalItemCount; i++) {
+  //     if (idMarketItemMapping[i + 1].sold == true && idMarketItemMapping[i + 1].bidded == false && idMarketItemMapping[i + 1].auctionInfo.startAt < block.timestamp && idMarketItemMapping[i + 1].auctionInfo.highestBidder != address(0)) {
+  //       if (idMarketItemMapping[i + 1].auctionInfo.highestBidder == msg.sender) {
+  //         uint currentId = i + 1;
+  //         MarketItem storage currentItem = idMarketItemMapping[currentId];
+  //         _items[currentIndex] = currentItem;
+  //         currentIndex += 1;
+  //       } else {
+  //         Bid[] memory bids = idMarketItemMapping[i + 1].auctionInfo.bids;
+  //         for (uint j = 0; j < bids.length; j++) {
+  //           if (bids[j].bidder == msg.sender) {
+  //             uint currentId = i + 1;
+  //             MarketItem storage currentItem = idMarketItemMapping[currentId];
+  //             _items[currentIndex] = currentItem;
+  //             currentIndex += 1;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return _items;
+  // }
 
-  /* Returns only items that a user has purchased */
-  function fetchMyNFTs() public view returns (MarketItem[] memory items) {
-    uint totalItemCount = _tokenIds.current();
-      uint itemCount = 0;
-      uint currentIndex = 0;
+  // /* Returns only items that a user has purchased */
+  // function fetchMyNFTs() public view returns (MarketItem[] memory items) {
+  //   uint totalItemCount = _tokenIds.current();
+  //     uint itemCount = 0;
+  //     uint currentIndex = 0;
 
-      for (uint i = 0; i < totalItemCount; i++) {
-        if (idMarketItemMapping[i + 1].owner == msg.sender) {
-          itemCount += 1;
-        }
-      }
+  //     for (uint i = 0; i < totalItemCount; i++) {
+  //       if (idMarketItemMapping[i + 1].owner == msg.sender) {
+  //         itemCount += 1;
+  //       }
+  //     }
 
-      MarketItem[] memory _items = new MarketItem[](itemCount);
-      for (uint i = 0; i < totalItemCount; i++) {
-        if (idMarketItemMapping[i + 1].owner == msg.sender) {
-          uint currentId = i + 1;
-          MarketItem storage currentItem = idMarketItemMapping[currentId];
-          _items[currentIndex] = currentItem;
-          currentIndex += 1;
-        }
-      }
-      return _items;
-  }
+  //     MarketItem[] memory _items = new MarketItem[](itemCount);
+  //     for (uint i = 0; i < totalItemCount; i++) {
+  //       if (idMarketItemMapping[i + 1].owner == msg.sender) {
+  //         uint currentId = i + 1;
+  //         MarketItem storage currentItem = idMarketItemMapping[currentId];
+  //         _items[currentIndex] = currentItem;
+  //         currentIndex += 1;
+  //       }
+  //     }
+  //     return _items;
+  // }
 
-  /* Returns only items a user has listed */
-  function fetchItemsListed() public view returns (MarketItem[] memory items) {
-    uint totalItemCount = _tokenIds.current();
-      uint itemCount = 0;
-      uint currentIndex = 0;
+  // /* Returns only items a user has listed */
+  // function fetchItemsListed() public view returns (MarketItem[] memory items) {
+  //   uint totalItemCount = _tokenIds.current();
+  //     uint itemCount = 0;
+  //     uint currentIndex = 0;
 
-      for (uint i = 0; i < totalItemCount; i++) {
-        if (idMarketItemMapping[i + 1].seller == msg.sender) {
-          itemCount += 1;
-        }
-      }
+  //     for (uint i = 0; i < totalItemCount; i++) {
+  //       if (idMarketItemMapping[i + 1].seller == msg.sender) {
+  //         itemCount += 1;
+  //       }
+  //     }
 
-      MarketItem[] memory _items = new MarketItem[](itemCount);
-      for (uint i = 0; i < totalItemCount; i++) {
-        if (idMarketItemMapping[i + 1].seller == msg.sender) {
-          uint currentId = i + 1;
-          MarketItem storage currentItem = idMarketItemMapping[currentId];
-          _items[currentIndex] = currentItem;
-          currentIndex += 1;
-        }
-      }
-      return _items;
-  }
+  //     MarketItem[] memory _items = new MarketItem[](itemCount);
+  //     for (uint i = 0; i < totalItemCount; i++) {
+  //       if (idMarketItemMapping[i + 1].seller == msg.sender) {
+  //         uint currentId = i + 1;
+  //         MarketItem storage currentItem = idMarketItemMapping[currentId];
+  //         _items[currentIndex] = currentItem;
+  //         currentIndex += 1;
+  //       }
+  //     }
+  //     return _items;
+  // }
 
   /**ERC1155 functionality ***********************************************/
-  function get1155TokenURI(uint256 _tokenId) public view returns(string memory){
-    return _multiToken.getTokenURI(_tokenId);
+  function get1155TokenURI(uint256 _tokenId, address _collection) public view returns(string memory){
+    return UITToken1155(_collection).getTokenURI(_tokenId);
   }
-  function createNFT1155(uint256 _tokenId, uint256 _amount, string memory _tokenUri) private {
-    _multiToken.mintNFT(msg.sender, _tokenId, _amount, _tokenUri);
+  function createNFT1155(uint256 _tokenId, uint256 _amount, string memory _tokenUri, address _collection) private {
+    UITToken1155(_collection).mintNFT(msg.sender, _tokenId, _amount, _tokenUri);
   }
 
   /**ERC721 functionality *************************************************/
-  function createNFT721(uint256 _tokenId, string memory uri, string memory name, string memory symbol) private {
-    _nftToken.mintNFT(msg.sender, _tokenId, uri, name, symbol);
+  function createNFT721(uint256 _tokenId, string memory uri, address _collection) private {
+    UITToken721(_collection).mintNFT(msg.sender, _tokenId, uri);
   }
 
-  function get721TokenURI(uint256 _tokenId) public view returns(string memory) {
-    return _nftToken.getTokenUri(_tokenId);
+  function get721TokenURI(uint256 _tokenId, address _collection) public view returns(string memory) {
+    return UITToken721(_collection).getTokenUri(_tokenId);
   }
 
   function transferToken(address _owner, address _receiver, uint _tokenId, address _nftContract, bool isMultiToken) private {

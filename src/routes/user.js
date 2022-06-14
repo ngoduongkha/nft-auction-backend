@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/user");
-const hre = require("hardhat");
 
 router.get("/", async function (_req, res) {
   return UserModel.find()
@@ -70,16 +69,11 @@ router.post("/", async function (req, res) {
 });
 
 router.post("/collection", async function (req, res) {
-  const { userId, name, isMultiToken } = req.body;
-  const contract = isMultiToken
-    ? await hre.ethers.getContractFactory("UITToken1155")
-    : await hre.ethers.getContractFactory("UITToken721");
-  const token = await contract.deploy();
-  await token.deployed();
+  const { userId, name, address, isMultiToken } = req.body;
 
   const collection = {
     name: name,
-    address: token.address,
+    address: address,
     isMultiToken: isMultiToken,
   };
 
