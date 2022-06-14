@@ -858,6 +858,41 @@
       "artifacts": [
         "Strings"
       ]
+    },
+    "D:\\GitHub\\nft-auction-backend\\contracts\\VerifySignature.sol": {
+      "lastModificationDate": 1655232932976,
+      "contentHash": "2f77082936f84f6cd9465dd44a4bd70a",
+      "sourceName": "contracts/VerifySignature.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.4"
+      ],
+      "artifacts": [
+        "VerifySignature"
+      ]
     }
   }
 }

@@ -14,10 +14,13 @@ router.get("/id/:id", async (req, res) => {
 });
 
 router.get("/user/:address", async function (req, res) {
-  const { pageNumber = 1, pageSize = 10 } = req.query;
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-    const data = await NftModel.find({ owner: req.params.address })
+    const query = { owner: req.params.address };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
@@ -25,7 +28,15 @@ router.get("/user/:address", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Get user nft successfully",
-      data: data,
+      data: {
+        nfts: nfts,
+        meta: {
+          total: total,
+          currentPage: pageNumber,
+          pageSize: pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      },
     });
   } catch (error) {
     console.log("Get user nft failed");
@@ -39,10 +50,13 @@ router.get("/user/:address", async function (req, res) {
 });
 
 router.get("/user/:address/listing", async function (req, res) {
-  const { pageNumber = 1, pageSize = 10 } = req.query;
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-    const data = await NftModel.find({ seller: req.params.address })
+    const query = { seller: req.params.address };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
@@ -50,7 +64,15 @@ router.get("/user/:address/listing", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Get user listing nft successfully",
-      data: data,
+      data: {
+        nfts: nfts,
+        meta: {
+          total: total,
+          currentPage: pageNumber,
+          pageSize: pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      },
     });
   } catch (error) {
     console.log("Get user listing nft failed");
@@ -64,10 +86,11 @@ router.get("/user/:address/listing", async function (req, res) {
 });
 
 router.get("/user/:address/bidding-auction", async function (req, res) {
-  const { pageNumber = 1, pageSize = 10 } = req.query;
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-    const data = await NftModel.find({
+    const query = {
       $and: [
         { sold: true },
         { bidded: false },
@@ -85,7 +108,9 @@ router.get("/user/:address/bidding-auction", async function (req, res) {
           ],
         },
       ],
-    })
+    };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
@@ -93,7 +118,15 @@ router.get("/user/:address/bidding-auction", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Get user bidding nft successfully",
-      data: data,
+      data: {
+        nfts: nfts,
+        meta: {
+          total: total,
+          currentPage: pageNumber,
+          pageSize: pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      },
     });
   } catch (error) {
     console.log("Get user bidding nft failed");
@@ -107,15 +140,18 @@ router.get("/user/:address/bidding-auction", async function (req, res) {
 });
 
 router.get("/", async function (req, res) {
-  const { pageNumber = 1, pageSize = 10 } = req.query;
-
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
   const bidded = req.query.bidded === undefined || req.query.bidded === "true";
   const sold = req.query.sold === undefined || req.query.sold === "true";
 
   try {
-    const data = await NftModel.find({
+    const query = {
       $and: [{ sold: sold }, { bidded: bidded }],
-    })
+    };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
+      .limit(pageSize)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
@@ -123,7 +159,15 @@ router.get("/", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Get listing successfully",
-      data: data,
+      data: {
+        nfts: nfts,
+        meta: {
+          total: total,
+          currentPage: pageNumber,
+          pageSize: pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      },
     });
   } catch (error) {
     console.log("Get listing failed");
@@ -137,12 +181,15 @@ router.get("/", async function (req, res) {
 });
 
 router.get("/listing", async function (req, res) {
-  const { pageNumber = 1, pageSize = 10 } = req.query;
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-    const data = await NftModel.find({
+    const query = {
       $or: [{ sold: false }, { bidded: false }],
-    })
+    };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
@@ -150,7 +197,15 @@ router.get("/listing", async function (req, res) {
     res.status(200).json({
       success: true,
       message: "Get listing successfully",
-      data: data,
+      data: {
+        nfts: nfts,
+        meta: {
+          total: total,
+          currentPage: pageNumber,
+          pageSize: pageSize,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      },
     });
   } catch (error) {
     console.log("Get listing failed");
