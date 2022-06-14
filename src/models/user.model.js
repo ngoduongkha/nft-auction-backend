@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
     validate: [isEmail, "Please fill a valid email address"],
+    default: "example@gmail.com",
   },
   wallet: {
     type: String,
