@@ -25,10 +25,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     lowercase: true,
+    default: "Anonymous",
   },
   bio: {
     type: String,
     trim: true,
+    default: "Your bio",
   },
   email: {
     type: String,
@@ -47,10 +49,14 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
     trim: true,
+    default:
+      "https://lh3.googleusercontent.com/TALoOqK5sH2mpwGmo_7MvL_TlK4uFDFDoGcdhpWx7x4ETcaSxBCSoYhNFJN-xk5LeUmB-EOsimQ7J4aNi-aVaoBv7E5rPMW5BpD8=w343",
   },
   banner: {
     type: String,
     trim: true,
+    default:
+      "https://lh3.googleusercontent.com/2v_bGfNzHAhfiDUpK_l7svabJSzbGRGDso72zDGI6Dt8973rXPmaNEUhC8_rc6y-pqW5-x8hqvGMmyE6Kerw0POTafWQsACkLftY7w=h600",
   },
   refreshToken: {
     type: String,
