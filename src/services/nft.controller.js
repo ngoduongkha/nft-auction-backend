@@ -7,12 +7,120 @@ exports.getNft = async function (req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "Get user nft successfully",
+      message: "Get nft successfully",
       data: nft,
     });
   } catch (error) {
-    console.log("Get user nft failed");
+    console.log("Get nft failed");
     console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getNfts = async function (req, res) {
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+  const bidded = req.query.bidded === undefined || req.query.bidded === "true";
+  const sold = req.query.sold === undefined || req.query.sold === "true";
+
+  try {
+    const query = {
+      $and: [{ sold: sold }, { bidded: bidded }],
+    };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
+      .skip(pageSize * pageNumber - pageSize)
+      .limit(pageSize);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get listing successfully",
+      data: nfts,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  } catch (error) {
+    console.log("Get listing failed");
+    console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getListingNfts = async function (req, res) {
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
+
+  try {
+    const query = {
+      $or: [{ sold: false }, { bidded: false }],
+    };
+    const total = await NftModel.find(query).count();
+    const nfts = await NftModel.find(query)
+      .skip(pageSize * pageNumber - pageSize)
+      .limit(pageSize);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get listing successfully",
+      data: nfts,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  } catch (error) {
+    console.log("Get listing failed");
+    console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
+exports.createNft = async function (req, res) {
+  const { tokenId, nftContract, name, description, image, isMultiToken } =
+    req.body;
+  const owner = req.user.wallet;
+
+  try {
+    const nft = await NftModel.create({
+      tokenId: tokenId,
+      collectionAddress: nftContract,
+      owner: owner,
+      isMultiToken: isMultiToken,
+      name: name,
+      description: description,
+      image: image,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Create market item successfully",
+      data: nft,
+    });
+  } catch (error) {
+    console.log("Create nft failed");
+    console.log("Message: ", error.message);
+
     return res.status(500).json({
       success: false,
       message: "Server error. Please try again.",
@@ -36,8 +144,6 @@ exports.listNft = async function (req, res) {
       },
       { new: true }
     );
-
-    console.log("List nft successfully");
 
     return res.status(200).json({
       success: true,
@@ -83,7 +189,7 @@ exports.createAuction = async function (req, res) {
     return res.status(200).json({
       success: true,
       message: "Create auction successfully",
-      data: data,
+      data: nft,
     });
   } catch (error) {
     console.log("Create auction failed");
@@ -135,8 +241,6 @@ exports.placeBid = async function (req, res) {
             { new: true }
           );
 
-    console.log("Place bid successfully");
-
     return res.status(200).json({
       success: true,
       message: "Place bid successfully",
@@ -170,7 +274,6 @@ exports.withdrawBid = async function (req, res) {
       },
       { new: true }
     );
-    console.log("Withdraw bid successfully");
 
     return res.status(200).json({
       success: true,
@@ -204,8 +307,6 @@ exports.buyNft = async function (req, res) {
       { new: true }
     );
 
-    console.log("Buy nft successfully");
-
     return res.status(200).json({
       success: true,
       message: "Buy nft successfully",
@@ -238,8 +339,7 @@ exports.cancelListing = async function (req, res) {
       }
     );
 
-    console.log("Cancel listing successfully");
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Cancel listing successfully",
       data: nft,
@@ -247,7 +347,8 @@ exports.cancelListing = async function (req, res) {
   } catch (error) {
     console.log("Cancel listing failed");
     console.log("Message: ", error.message);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Server error. Please try again.",
       error: error.message,

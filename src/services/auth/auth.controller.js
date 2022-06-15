@@ -70,6 +70,7 @@ exports.login = async (req, res) => {
     data: {
       user: user,
       token: accessToken,
+      expiresAt: ACCESS_TOKEN_LIFE,
     },
   });
 };
@@ -135,6 +136,7 @@ exports.refreshToken = async (req, res) => {
     data: {
       user: user,
       token: accessToken,
+      expiresAt: ACCESS_TOKEN_LIFE,
     },
   });
 };

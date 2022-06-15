@@ -13,6 +13,9 @@ exports.getUser = async function (req, res) {
       data: user,
     });
   } catch (error) {
+    console.log("Get user failed");
+    console.log("Message: ", error.message);
+
     return res.status(500).json({
       success: false,
       message: "Server error. Please try again.",
@@ -46,6 +49,9 @@ exports.updateUser = async function (req, res) {
       data: user,
     });
   } catch (error) {
+    console.log("Update user failed");
+    console.log("Message: ", error.message);
+
     return res.status(500).json({
       success: false,
       message: "Server error. Please try again.",
@@ -71,14 +77,12 @@ exports.getNfts = async function (req, res) {
     return res.status(200).json({
       success: true,
       message: "Get user nft successfully",
-      data: {
-        nfts: nfts,
-        meta: {
-          total: total,
-          currentPage: pageNumber,
-          pageSize: pageSize,
-          totalPages: Math.ceil(total / pageSize),
-        },
+      data: nfts,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
       },
     });
   } catch (error) {
@@ -105,19 +109,15 @@ exports.getListingNfts = async function (req, res) {
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
-    console.log("Get user listing nfts successfully");
-
     return res.status(200).json({
       success: true,
       message: "Get user listing nfts successfully",
-      data: {
-        nfts: nfts,
-        meta: {
-          total: total,
-          currentPage: pageNumber,
-          pageSize: pageSize,
-          totalPages: Math.ceil(total / pageSize),
-        },
+      data: nfts,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
       },
     });
   } catch (error) {
@@ -162,19 +162,15 @@ exports.getBiddingNfts = async function (req, res) {
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
-    console.log("Get user bidding nfts successfully");
-
     return res.status(200).json({
       success: true,
       message: "Get user bidding nft successfully",
-      data: {
-        nfts: nfts,
-        meta: {
-          total: total,
-          currentPage: pageNumber,
-          pageSize: pageSize,
-          totalPages: Math.ceil(total / pageSize),
-        },
+      data: nfts,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
       },
     });
   } catch (error) {
