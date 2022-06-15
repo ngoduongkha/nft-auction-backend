@@ -38,6 +38,8 @@ exports.login = async (req, res) => {
 
     let user = await UserModel.findOne({ wallet: wallet });
 
+    console.log(user);
+
     if (!user) {
       user = await UserModel.create({ wallet: wallet });
     }
