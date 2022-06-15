@@ -38,9 +38,7 @@ exports.login = async (req, res) => {
 
     if (!user) {
       const newUser = new UserModel({ wallet: wallet });
-      console.log("1", newUser);
       await newUser.save();
-      console.log("2", newUser);
       user = newUser;
     }
 

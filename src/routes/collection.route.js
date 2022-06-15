@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get("/", collectionController.getCollections);
 
+router.get("/:collectionAddress", collectionController.getCollection);
+
 router.get("/:collectionAddress/nfts", collectionController.getNfts);
 
 router.post("/", isAuth, collectionController.createCollection);

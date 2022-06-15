@@ -1,6 +1,29 @@
 const { CollectionModel } = require("../models/collection.model");
 const { NftModel } = require("../models/nft.model");
 
+exports.getCollection = async function (req, res) {
+  try {
+    const collection = await CollectionModel.findOne({
+      address: req.params.collectionAddress,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Get collection successfully",
+      data: collection,
+    });
+  } catch (error) {
+    console.log("Get collection failed");
+    console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
 exports.getCollections = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
