@@ -13,6 +13,10 @@ const collectionSchema = new mongoose.Schema({
     required: "Collection address is required",
     validate: [isAddress, "Please fill a valid collection address"],
   },
+  description: {
+    type: String,
+    trim: true,
+  },
   image: {
     type: String,
     required: true,
