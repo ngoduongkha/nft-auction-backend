@@ -51,7 +51,7 @@ const nftSchema = new mongoose.Schema({
     required: "Token id is required",
     unique: true,
   },
-  nftContract: {
+  collectionAddress: {
     type: String,
     trim: true,
     required: "Nft contract address is required",
@@ -101,4 +101,4 @@ const nftSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Nft", nftSchema);
+exports.NftModel = mongoose.model("Nft", nftSchema);

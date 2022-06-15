@@ -7,6 +7,7 @@ const mongoString = process.env.DATABASE_URL;
 const nftRoutes = require("./src/routes/nft.route");
 const userRoutes = require("./src/routes/user.route");
 const authRoutes = require("./src/routes/auth.route");
+const collectionRoutes = require("./src/routes/collection.route");
 const cors = require("cors");
 
 mongoose.connect(mongoString);
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/nft", nftRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/collection", collectionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server Started at ${PORT}`);

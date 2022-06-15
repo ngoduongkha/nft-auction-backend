@@ -4,11 +4,12 @@ const ACCESS_TOKEN_LIFE = process.env.ACCESS_TOKEN_LIFE;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SIZE = process.env.REFRESH_TOKEN_SIZE;
 
-const UserModel = require("../../models/user.model");
+const { UserModel } = require("../../models/user.model");
 const authMethod = require("./auth.method");
 
 exports.isAuth = async (req, res, next) => {
   const accessTokenFromHeader = req.headers.x_authorization;
+
   if (!accessTokenFromHeader) {
     return res.status(401).json({
       success: false,
@@ -30,7 +31,7 @@ exports.isAuth = async (req, res, next) => {
     });
   }
 
-  const user = await UserModel.getUser(verified.payload.username);
+  const user = await UserModel.findOne({ wallet: verified.payload.wallet });
   req.user = user;
 
   return next();
