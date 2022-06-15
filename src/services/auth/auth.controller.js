@@ -36,18 +36,11 @@ exports.login = async (req, res) => {
       });
     }
 
-    console.log("wallet: ", wallet);
-    console.log("message: ", message);
-    console.log("sig: ", sig);
-
     let user = await UserModel.findOne({ wallet: wallet });
 
-    console.log(user);
-
     if (!user) {
-      console.log("wallet: ", wallet);
-      user = await UserModel.create({ wallet: wallet });
-      console.log(user);
+      user = new UserModel({ wallet: wallet });
+      user.save();
     }
 
     const dataForAccessToken = {
@@ -87,7 +80,6 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     console.log(error.message);
 
     return res.status(500).json({
