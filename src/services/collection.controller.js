@@ -71,7 +71,7 @@ exports.getNfts = async function (req, res) {
 };
 
 exports.createCollection = async function (req, res) {
-  const { name, address, image, banner, isMultiToken } = req.body;
+  const { name, address, image, description, banner, isMultiToken } = req.body;
   const owner = req.user.wallet;
 
   try {
@@ -79,6 +79,7 @@ exports.createCollection = async function (req, res) {
       owner: owner,
       name: name,
       address: address,
+      description: description,
       image: image,
       banner: banner,
       isMultiToken: isMultiToken,
