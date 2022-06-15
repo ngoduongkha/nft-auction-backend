@@ -7,6 +7,8 @@ exports.getCollection = async function (req, res) {
       address: req.params.collectionAddress,
     });
 
+    console.log(req.params);
+
     return res.status(200).json({
       success: true,
       message: "Get collection successfully",
