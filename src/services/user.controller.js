@@ -1,3 +1,4 @@
+const { CollectionModel } = require("../models/collection.model");
 const { NftModel } = require("../models/nft.model");
 const { UserModel } = require("../models/user.model");
 
@@ -60,6 +61,30 @@ exports.updateUser = async function (req, res) {
   }
 };
 
+exports.getCollections = async function (req, res) {
+  const wallet = req.user.wallet;
+
+  try {
+    const query = { owner: wallet };
+    const collections = await CollectionModel.find(query);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get user collections successfully",
+      data: collections,
+    });
+  } catch (error) {
+    console.log("Get user collections failed");
+    console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
 exports.getNfts = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
@@ -72,11 +97,9 @@ exports.getNfts = async function (req, res) {
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
-    console.log("Get user nfts successfully");
-
     return res.status(200).json({
       success: true,
-      message: "Get user nft successfully",
+      message: "Get user nfts successfully",
       data: nfts,
       pagination: {
         total: total,

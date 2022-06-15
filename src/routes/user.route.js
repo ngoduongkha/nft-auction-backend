@@ -7,6 +7,8 @@ router.get("/", isAuth, userController.getUser);
 
 router.get("/nfts", isAuth, userController.getNfts);
 
+router.get("/collections", isAuth, userController.getCollections);
+
 router.get("/listing-nfts", isAuth, userController.getListingNfts);
 
 router.get("/bidding-nfts", isAuth, userController.getBiddingNfts);
