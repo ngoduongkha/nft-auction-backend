@@ -23,6 +23,6 @@ router.patch("/withdraw-bid", isAuth, nftController.withdrawBid);
 
 router.patch("/buy", isAuth, nftController.buyNft);
 
-router.patch("/cancelList", isAuth, nftController.cancelListing);
+router.patch("/cance-list", isAuth, nftController.cancelListing);
 
 module.exports = router;
