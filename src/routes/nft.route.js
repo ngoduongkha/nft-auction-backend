@@ -19,7 +19,7 @@ router.patch("/create-auction", isAuth, nftController.createAuction);
 
 router.patch("/place-bid", isAuth, nftController.placeBid);
 
-router.patch("/withdrawBid", isAuth, nftController.withdrawBid);
+router.patch("/withdraw-bid", isAuth, nftController.withdrawBid);
 
 router.patch("/buy", isAuth, nftController.buyNft);
 
