@@ -36,6 +36,10 @@ exports.login = async (req, res) => {
       });
     }
 
+    console.log("wallet: ", wallet);
+    console.log("message: ", message);
+    console.log("sig: ", sig);
+
     let user = await UserModel.findOne({ wallet: wallet });
 
     console.log(user);
