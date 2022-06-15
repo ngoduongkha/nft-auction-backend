@@ -7,8 +7,6 @@ exports.getCollection = async function (req, res) {
       address: req.params.collectionAddress,
     });
 
-    console.log(req.params);
-
     return res.status(200).json({
       success: true,
       message: "Get collection successfully",
@@ -117,6 +115,40 @@ exports.createCollection = async function (req, res) {
     });
   } catch (error) {
     console.log("Create collection failed");
+    console.log("Message: ", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again.",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateCollection = async function (req, res) {
+  const { name, image, description, banner } = req.body;
+  const address = req.params.collectionAddress;
+  const owner = req.user.wallet;
+
+  try {
+    const collection = await CollectionModel.findOneAndUpdate(
+      { address: address, owner: owner },
+      {
+        name: name,
+        description: description,
+        image: image,
+        banner: banner,
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Update collection successfully",
+      data: collection,
+    });
+  } catch (error) {
+    console.log("Update collection failed");
     console.log("Message: ", error.message);
 
     return res.status(500).json({

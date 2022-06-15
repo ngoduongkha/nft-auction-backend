@@ -11,4 +11,10 @@ router.get("/:collectionAddress/nfts", collectionController.getNfts);
 
 router.post("/", isAuth, collectionController.createCollection);
 
+router.patch(
+  "/:collectionAddress",
+  isAuth,
+  collectionController.updateCollection
+);
+
 module.exports = router;
