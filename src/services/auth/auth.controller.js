@@ -18,12 +18,12 @@ exports.login = async (req, res) => {
 
   try {
     const provider = new ethers.getDefaultProvider("rinkeby");
-    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+    //const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
     const contract = new ethers.Contract(
       VERIFY_SIGNATURE_CONTRACT_ADDRESS,
       verifySignature.abi,
-      signer
+      provider
     );
 
     const verified = await contract.verify(wallet, message, sig);
