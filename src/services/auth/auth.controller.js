@@ -39,8 +39,9 @@ exports.login = async (req, res) => {
     let user = await UserModel.findOne({ wallet: wallet });
 
     if (!user) {
-      user = new UserModel({ wallet: wallet });
-      user.save();
+      const newUser = new UserModel({ wallet: wallet });
+      newUser.save();
+      user = newUser;
     }
 
     const dataForAccessToken = {
