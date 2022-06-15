@@ -1,13 +1,10 @@
 const express = require("express");
 const { isAuth } = require("../services/auth/auth.middleware");
-const {
-  getAllCollection,
-  createCollection,
-} = require("../services/collection.controller");
+const collectionController = require("../services/collection.controller");
 const router = express.Router();
 
-router.get("/", getAllCollection);
+router.get("/", collectionController.getCollections);
 
-router.post("/", isAuth, createCollection);
+router.post("/", isAuth, collectionController.createCollection);
 
 module.exports = router;

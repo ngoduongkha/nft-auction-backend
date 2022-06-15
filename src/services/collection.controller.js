@@ -1,6 +1,6 @@
 const { CollectionModel } = require("../models/collection.model");
 
-exports.getAllCollection = async function (req, res) {
+exports.getCollections = async function (req, res) {
   try {
     const data = await CollectionModel.find();
 

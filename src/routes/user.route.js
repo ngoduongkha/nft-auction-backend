@@ -1,22 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const { isAuth } = require("../services/auth/auth.middleware");
-const {
-  getUser,
-  updateUser,
-  getNfts,
-  getListingNfts,
-  getBiddingNfts,
-} = require("../services/user.controller");
+const userController = require("../services/user.controller");
 
-router.get("/", isAuth, getUser);
+router.get("/", isAuth, userController.getUser);
 
-router.get("/nfts", isAuth, getNfts);
+router.get("/nfts", isAuth, userController.getNfts);
 
-router.get("/listing-nfts", isAuth, getListingNfts);
+router.get("/listing-nfts", isAuth, userController.getListingNfts);
 
-router.get("/", isAuth, getBiddingNfts);
+router.get("/bidding-nfts", isAuth, userController.getBiddingNfts);
 
-router.patch("/", isAuth, updateUser);
+router.patch("/", isAuth, userController.updateUser);
 
 module.exports = router;

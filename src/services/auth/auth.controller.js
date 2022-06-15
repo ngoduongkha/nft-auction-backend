@@ -10,36 +10,27 @@ const ACCESS_TOKEN_LIFE = process.env.ACCESS_TOKEN_LIFE;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SIZE = process.env.REFRESH_TOKEN_SIZE;
 const VERIFY_SIGNATURE_ADDRESS = process.env.VERIFY_SIGNATURE_ADDRESS;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 exports.login = async (req, res) => {
   const { wallet, message, sig } = req.body;
 
-  // const provider = new ethers.getDefaultProvider("rinkeby");
-  // const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+  const provider = new ethers.getDefaultProvider("rinkeby");
 
-  // const contract = new ethers.Contract(
-  //   VERIFY_SIGNATURE_ADDRESS,
-  //   verifySignature.abi,
-  //   signer
-  // );
+  const contract = new ethers.Contract(
+    VERIFY_SIGNATURE_ADDRESS,
+    verifySignature.abi,
+    provider
+  );
 
-  // const verified = await contract.verify(
-  //   wallet,
-  //   to,
-  //   amount,
-  //   message,
-  //   nonce,
-  //   sig
-  // );
+  const verified = await contract.verify(wallet, message, sig);
 
-  // if (!verified) {
-  //   return res.status(401).json({
-  //     success: false,
-  //     message: "Login failed",
-  //     error: "Login failed",
-  //   });
-  // }
+  if (!verified) {
+    return res.status(401).json({
+      success: false,
+      message: "Login failed",
+      error: "Login failed",
+    });
+  }
 
   let user = await UserModel.findOne({ wallet: wallet });
   if (!user) {
