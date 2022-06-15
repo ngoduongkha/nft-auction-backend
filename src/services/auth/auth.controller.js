@@ -42,6 +42,7 @@ exports.login = async (req, res) => {
 
     if (!user) {
       user = await UserModel.create({ wallet: wallet });
+      console.log(user);
     }
 
     const dataForAccessToken = {
