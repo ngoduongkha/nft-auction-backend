@@ -71,21 +71,23 @@ exports.getNfts = async function (req, res) {
 };
 
 exports.createCollection = async function (req, res) {
-  const { name, address, isMultiToken } = req.body;
+  const { name, address, image, banner, isMultiToken } = req.body;
   const owner = req.user.wallet;
 
   try {
-    const data = await CollectionModel.create({
+    const collection = await CollectionModel.create({
       owner: owner,
       name: name,
       address: address,
+      image: image,
+      banner: banner,
       isMultiToken: isMultiToken,
     });
 
     return res.status(201).json({
       success: true,
       message: "Create collection successfully",
-      data: data,
+      data: collection,
     });
   } catch (error) {
     console.log("Create collection failed");
