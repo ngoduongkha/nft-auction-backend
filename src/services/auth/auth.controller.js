@@ -11,14 +11,12 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_TOKEN_SIZE = process.env.REFRESH_TOKEN_SIZE;
 const VERIFY_SIGNATURE_CONTRACT_ADDRESS =
   process.env.VERIFY_SIGNATURE_CONTRACT_ADDRESS;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 exports.login = async (req, res) => {
   const { wallet, message, sig } = req.body;
 
   try {
     const provider = new ethers.getDefaultProvider("rinkeby");
-    //const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
     const contract = new ethers.Contract(
       VERIFY_SIGNATURE_CONTRACT_ADDRESS,
@@ -40,7 +38,7 @@ exports.login = async (req, res) => {
 
     if (!user) {
       const newUser = new UserModel({ wallet: wallet });
-      newUser.save();
+      await newUser.save();
       user = newUser;
     }
 
