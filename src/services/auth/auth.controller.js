@@ -41,6 +41,7 @@ exports.login = async (req, res) => {
     console.log(user);
 
     if (!user) {
+      console.log("wallet: ", wallet);
       user = await UserModel.create({ wallet: wallet });
       console.log(user);
     }
