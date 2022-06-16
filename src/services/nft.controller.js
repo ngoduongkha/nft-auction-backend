@@ -32,7 +32,7 @@ exports.getNfts = async function (req, res) {
   try {
     const query = {
       $and: [
-        { name: { $regex: ".*" + name + ".*" } },
+        { name: { $regex: new RegExp(name, "i") } },
         { $or: [{ sold: sold }, { bidded: bidded }] },
       ],
     };
