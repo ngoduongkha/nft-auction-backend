@@ -25,12 +25,16 @@ exports.getNft = async function (req, res) {
 exports.getNfts = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  const bidded = req.query.bidded === undefined || req.query.bidded === "true";
-  const sold = req.query.sold === undefined || req.query.sold === "true";
+  const bidded = req.query.bidded === "true" || false;
+  const sold = req.query.sold === "true" || false;
+  const name = req.query.name;
 
   try {
     const query = {
-      $and: [{ sold: sold }, { bidded: bidded }],
+      $and: [
+        { name: { $regex: ".*" + name + ".*" } },
+        { $or: [{ sold: sold }, { bidded: bidded }] },
+      ],
     };
     const total = await NftModel.find(query).count();
     const nfts = await NftModel.find(query)
