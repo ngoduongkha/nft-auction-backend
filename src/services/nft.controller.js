@@ -198,8 +198,8 @@ exports.createAuction = async function (req, res) {
         seller: seller,
         owner: MARKET_CONTRACT_ADDRESS,
         bidded: false,
+        price: startingPrice,
         $set: {
-          "auctionInfo.startAt": startTime,
           "auctionInfo.startAt": startTime,
           "auctionInfo.endAt": endTime,
           "auctionInfo.startingPrice": startingPrice,
@@ -208,8 +208,6 @@ exports.createAuction = async function (req, res) {
       },
       { new: true }
     );
-
-    console.log("Create auction successfully");
 
     return res.status(200).json({
       success: true,
@@ -243,6 +241,7 @@ exports.placeBid = async function (req, res) {
         ? await NftModel.findOneAndUpdate(
             { tokenId: tokenId },
             {
+              price: bid,
               "auctionInfo.highestBid": bid,
               "auctionInfo.highestBidder": bidder,
               "auctionInfo.highestBidTime": bidTime,
@@ -252,6 +251,7 @@ exports.placeBid = async function (req, res) {
         : await NftModel.findOneAndUpdate(
             { tokenId: tokenId },
             {
+              price: bid,
               "auctionInfo.highestBid": bid,
               "auctionInfo.highestBidder": bidder,
               "auctionInfo.highestBidTime": bidTime,
