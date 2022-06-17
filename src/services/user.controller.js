@@ -3,7 +3,7 @@ const { NftModel } = require("../models/nft.model");
 const { UserModel } = require("../models/user.model");
 
 exports.getUser = async function (req, res) {
-  const wallet = req.user.wallet;
+  const wallet = req.params.wallet;
 
   try {
     const user = await UserModel.findOne({ wallet: wallet });
@@ -62,7 +62,7 @@ exports.updateUser = async function (req, res) {
 };
 
 exports.getCollections = async function (req, res) {
-  const wallet = req.user.wallet;
+  const wallet = req.params.wallet;
 
   try {
     const query = { owner: wallet };
@@ -88,7 +88,7 @@ exports.getCollections = async function (req, res) {
 exports.getNfts = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  const wallet = req.user.wallet;
+  const wallet = req.params.wallet;
 
   try {
     const query = { owner: wallet };
@@ -123,7 +123,7 @@ exports.getNfts = async function (req, res) {
 exports.getListingNfts = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  const wallet = req.user.wallet;
+  const wallet = req.params.wallet;
 
   try {
     const query = { seller: wallet };
@@ -158,7 +158,7 @@ exports.getListingNfts = async function (req, res) {
 exports.getBiddingNfts = async function (req, res) {
   const pageNumber = parseInt(req.query.pageNumber) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10;
-  const wallet = req.user.wallet;
+  const wallet = req.params.wallet;
 
   try {
     const query = {

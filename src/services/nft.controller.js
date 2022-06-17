@@ -27,17 +27,28 @@ exports.getNfts = async function (req, res) {
   const pageSize = parseInt(req.query.pageSize) || 10;
   const bidded = req.query.bidded === "true" || false;
   const sold = req.query.sold === "true" || false;
+  const sortBy = req.query.sortBy;
+  const sortDirection = req.query.sortDirection || "ASC";
   const name = req.query.name;
 
   try {
     const query = {
       $and: [
         { name: { $regex: new RegExp(name, "i") } },
-        { $or: [{ sold: sold }, { bidded: bidded }] },
+        sold === false && bidded === false
+          ? { $or: [{ sold: sold }, { bidded: bidded }] }
+          : { $and: [{ sold: sold }, { bidded: bidded }] },
       ],
     };
+    const sort = sortBy
+      ? sortDirection === "ASC"
+        ? `${sortBy}`
+        : `-${sortBy}`
+      : "";
+
     const total = await NftModel.find(query).count();
     const nfts = await NftModel.find(query)
+      .sort(sort)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
