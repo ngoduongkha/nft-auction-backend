@@ -25,7 +25,7 @@ exports.getCollection = async function (req, res) {
     return res.status(200).json({
       success: true,
       message: "Get collection successfully",
-      data: collection,
+      data: collection[0] ?? null,
     });
   } catch (error) {
     console.log("Get collection failed");
