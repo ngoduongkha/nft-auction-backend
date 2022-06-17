@@ -5,6 +5,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PROJECT_ID = process.env.PROJECT_ID;
 
 const express = require("express");
+const ethers = require("ethers");
 const nftController = require("../services/nft.controller");
 
 const { isAuth } = require("../services/auth/auth.middleware");
