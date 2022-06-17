@@ -62,16 +62,28 @@ exports.updateUser = async function (req, res) {
 };
 
 exports.getCollections = async function (req, res) {
+  const pageNumber = parseInt(req.query.pageNumber) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
   const wallet = req.params.wallet;
 
   try {
     const query = { owner: wallet };
-    const collections = await CollectionModel.find(query);
+
+    const total = await CollectionModel.find(query).count();
+    const collections = await CollectionModel.find(query)
+      .skip(pageSize * pageNumber - pageSize)
+      .limit(pageSize);
 
     return res.status(200).json({
       success: true,
       message: "Get user collections successfully",
       data: collections,
+      pagination: {
+        total: total,
+        currentPage: pageNumber,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
     });
   } catch (error) {
     console.log("Get user collections failed");
