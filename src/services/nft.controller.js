@@ -27,7 +27,7 @@ exports.getNfts = async function (req, res) {
   const pageSize = parseInt(req.query.pageSize) || 10;
   const bidded = req.query.bidded === "true" || false;
   const sold = req.query.sold === "true" || false;
-  const sortBy = req.query.sortBy;
+  const sortBy = req.query.sortBy || "tokenId";
   const sortDirection = req.query.sortDirection || "ASC";
   const name = req.query.name;
 
@@ -40,14 +40,24 @@ exports.getNfts = async function (req, res) {
           : { $and: [{ sold: sold }, { bidded: bidded }] },
       ],
     };
-    const sort = sortBy
-      ? sortDirection === "ASC"
-        ? `${sortBy}`
-        : `-${sortBy}`
-      : "";
-
+    const sort = sortDirection === "ASC" ? `${sortBy}` : `-${sortBy}`;
     const total = await NftModel.find(query).count();
-    const nfts = await NftModel.find(query)
+    const nfts = await NftModel.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "collections",
+          localField: "collectionAddress",
+          foreignField: "address",
+          as: "collectionName",
+        },
+      },
+      {
+        $set: {
+          collectionName: { $arrayElemAt: ["$collectionName.name", 0] },
+        },
+      },
+    ])
       .sort(sort)
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);

@@ -3,9 +3,24 @@ const { NftModel } = require("../models/nft.model");
 
 exports.getCollection = async function (req, res) {
   try {
-    const collection = await CollectionModel.findOne({
-      address: req.params.collectionAddress,
-    });
+    const collection = await CollectionModel.aggregate([
+      {
+        $match: { address: req.params.collectionAddress },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "wallet",
+          as: "ownerName",
+        },
+      },
+      {
+        $set: {
+          ownerName: { $arrayElemAt: ["$ownerName.username", 0] },
+        },
+      },
+    ]);
 
     return res.status(200).json({
       success: true,
@@ -30,7 +45,21 @@ exports.getCollections = async function (req, res) {
 
   try {
     const total = await CollectionModel.find().count();
-    const collections = await CollectionModel.find()
+    const collections = await CollectionModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "wallet",
+          as: "ownerName",
+        },
+      },
+      {
+        $set: {
+          ownerName: { $arrayElemAt: ["$ownerName.username", 0] },
+        },
+      },
+    ])
       .skip(pageSize * pageNumber - pageSize)
       .limit(pageSize);
 
