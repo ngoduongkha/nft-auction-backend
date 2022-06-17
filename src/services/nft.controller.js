@@ -380,3 +380,41 @@ exports.cancelListing = async function (req, res) {
     });
   }
 };
+
+exports.endAuction = async function (tokenId) {
+  try {
+    const old = await NftModel.findOne({
+      tokenId: tokenId,
+    });
+
+    if (
+      old.auctionInfo.highestBidder ===
+      "0x0000000000000000000000000000000000000000"
+    ) {
+      await NftModel.findOneAndUpdate(
+        { tokenId: tokenId },
+        {
+          owner: old.seller,
+          seller: "0x0000000000000000000000000000000000000000",
+          bidded: true,
+        },
+        { new: true }
+      );
+    } else {
+      await NftModel.findOneAndUpdate(
+        { tokenId: tokenId },
+        {
+          owner: old.auctionInfo.highestBidder,
+          seller: "0x0000000000000000000000000000000000000000",
+          bidded: true,
+        },
+        { new: true }
+      );
+    }
+
+    console.log(`End auction with tokenId (${tokenId}) successfully`);
+  } catch (error) {
+    console.log(`End auction with tokenId (${tokenId}) failed`);
+    console.log("Message: ", error.message);
+  }
+};
